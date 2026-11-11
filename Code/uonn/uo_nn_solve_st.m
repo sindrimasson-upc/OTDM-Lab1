@@ -53,7 +53,7 @@ tr_acc = nn.Acc(Xtr,ytr,wo);
 
 te_acc = nn.Acc(Xte,yte,wo);
 
-
+nnout.sol = sol;
 nnout.Xtr = Xtr;
 nnout.ytr = ytr;
 nnout.wo = wo;
