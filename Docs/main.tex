@@ -6,7 +6,7 @@
 
 \title{OTDM Assignment 1\\ Digit recognition with a single-layer neural network}
 \author{Michal Dudek \\ Sindri Masson}
-\date{October 2026\\[1ex]
+\date{November 12th, 2026\\[1ex]
 \small \texttt{tr\_seed} = 156057, \quad \texttt{te\_seed} = 560571, \quad \texttt{sg\_seed} = 156057}
 
 \begin{document}
@@ -61,10 +61,9 @@ SGM & $m=10$, $\alpha_0=2$, $\beta=0.3$, at most 100 epochs, stop after 5 epochs
 \label{tab:setup}
 \end{table}
 
-\textbf{Code.} The batch script \texttt{uo\_nn\_\allowbreak batch\_st.m} runs the 90 instances with our implementation (\texttt{uo\_nn\_\allowbreak solve\_st.m} and \texttt{uosol\_st.m}) and produces the iterations, final losses, gradient norms, times and accuracies. The script \texttt{uo\_nn\_\allowbreak lambda\_\allowbreak analysis.m} repeats the runs with the same settings and records the quantities that the batch does not write: the gradient norm, the strong Wolfe outcome, $\kappa(H_k)$ and $\cos\theta_k$ at every iteration, the gradient norm at the SGM solutions, $\|w^*\|$, the Hessian of $\tilde L$ at $w^*$, and the true and false positives on the test set, also split by the true digit of each image. The true digit is known because the test images are the same for every target; only the labels change.
+\textbf{Code.} The batch script \texttt{uo\_nn\_\allowbreak batch\_st.m} runs the 90 instances with our implementation (\texttt{uo\_nn\_\allowbreak solve\_st.m} and \texttt{uosol\_st.m}) and produces the iterations, final losses, gradient norms, times and accuracies. The script \texttt{uo\_nn\_\allowbreak diag.m} gives the additional numbers for $\lambda=0$ in Section~\ref{sec:lambda0}. The script \texttt{uo\_nn\_\allowbreak lambda\_\allowbreak analysis.m} repeats the runs with the same settings and records the quantities that the batch does not write: the gradient norm, the strong Wolfe outcome, $\kappa(H_k)$ and $\cos\theta_k$ at every iteration, the gradient norm at the SGM solutions, $\|w^*\|$, the Hessian of $\tilde L$ at $w^*$, and the true and false positives on the test set, also split by the true digit of each image. The true digit is known because the test images are the same for every target; only the labels change.
 
 \textbf{Random line search.} The line search \texttt{uoBLSNW32} draws random numbers from the global Matlab generator, so the accepted step lengths, and therefore the number of GM and BFGS iterations, depend on the state of the generator. In the batch this state is fixed because \texttt{uo\_nn\_dataset} resets it just before every run, so the batch is reproducible. To see how much the iteration counts depend on it, \texttt{uo\_nn\_\allowbreak lambda\_\allowbreak analysis.m} repeats every GM and BFGS run with five other states (\texttt{rng(1)} to \texttt{rng(5)}). For example, BFGS on digit 1 with $\lambda=0$ needed between 4 and 22 iterations. Differences of a few iterations between two single runs are therefore not meaningful.
-
 \section{Comparison of methods without regularization}\label{sec:lambda0}
 
 \subsection{What $\lambda=0$ means}
@@ -104,7 +103,7 @@ Mean & 57.3 &  & 3.18 & 31.6 &  & 1.78 & 18.3 &  & 0.33 \\
 \end{table}
 
 \begin{itemize}
-  \item \textbf{GM} converged within 100 iterations on 8 of 10 digits, with a median of $\frac{26+61}{2}=43.5$ iterations. Digits 3 and 8 stopped at the iteration limit with $\|\nabla\tilde L\|=1.3\cdot10^{-3}$ and $2.8\cdot10^{-3}$, which is on the order of magnitude of the tolerance but just slightly too high. Digit 9 also needed all 100 iterations, but its gradient norm $9.8\cdot10^{-4}$ is just below the tolerance, so we count it as converged. When we raised the iteration limit to 1000, GM reached the tolerance on digit 3 after 121 iterations and on digit 8 after 193 iterations (7.0\,s and 11\,s). GM therefore converged on all ten digits.
+  \item \textbf{GM} converged within 100 iterations on 8 of 10 digits, with a median of $\frac{26+61}{2}=43.5$ iterations. Digits 3 and 8 stopped at the iteration limit with $\|\nabla\tilde L\|=1.3\cdot10^{-3}$ and $2.8\cdot10^{-3}$, which is on the order of magnitude of the tolerance but just slightly too high. Digit 9 also needed all 100 iterations, but its gradient norm $9.8\cdot10^{-4}$ is just below the tolerance, so we count it as converged. When we raised the iteration limit to 1000, GM reached the tolerance on digit 3 after 121 iterations and on digit 8 after 193 iterations (7.6\,s and 12\,s). GM therefore converged on all ten digits.
   \item \textbf{BFGS} converged on all 10 digits within 100 iterations. The slowest was digit 8 with 97 iterations, and the median number of iterations was $\frac{18+29}{2} = 23.5$.
   \item \textbf{SGM} stopped early on 9 of 10 digits, after 8 to 11 epochs. On digit 4 the test loss kept improving and the run used all 100 epochs.
 \end{itemize}
@@ -121,7 +120,7 @@ SGM converges in a different sense. At the SGM solutions $\|\nabla\tilde L(w^*)\
 
 \textbf{Time per iteration.} Dividing the total time by the total number of iterations over the ten digits gives about 0.055\,s per iteration for both GM and BFGS (31.8\,s per 573 and 17.8\,s per 316 iterations). For SGM it is $3.6\cdot10^{-5}$\,s per minibatch step, or about 0.018\,s per epoch. Since $t$ is rounded to two digits in the CSV output, these values are accurate to about 10\%.
 
-To explain these numbers we timed the loss and the gradient on the full training set (digit 8): the loss takes 1.1\,ms and the gradient 4.4\,ms, so a GM or BFGS iteration costs about 12 gradient evaluations. The evaluation of the loss and gradient on all $p=5000$ samples ($O(np)\approx1.8\cdot10^{5}$ operations) dominates. Part of the 12 evaluations comes from our implementation: the code of \texttt{uosol\_st} calls the gradient at least six times per iteration outside the line search (stopping test, search direction, descent check, step bound and storing the iterate), and the line search evaluates the loss and the gradient at each trial step. The BFGS update costs only $O(n^2)\approx1.2\cdot10^{3}$ operations, below 1\% of one gradient, so BFGS and GM cost the same per iteration and BFGS wins only through fewer iterations. A minibatch gradient takes $3.1\cdot10^{-5}$\,s, which matches the $3.6\cdot10^{-5}$\,s per SGM step, and an epoch of 500 steps takes about $500\cdot3.1\cdot10^{-5}=0.016$\,s, about three times less than a GM iteration.
+To explain these numbers we timed the loss and the gradient on the full training set (digit 8): the loss takes 1.1\,ms and the gradient 5.1\,ms, so a GM or BFGS iteration costs about 11 gradient evaluations. The evaluation of the loss and gradient on all $p=5000$ samples ($O(np)\approx1.8\cdot10^{5}$ operations) dominates. Part of the 11 evaluations comes from our implementation: the code of \texttt{uosol\_st} calls the gradient at least six times per iteration outside the line search (stopping test, search direction, descent check, step bound and storing the iterate), and the line search evaluates the loss and the gradient at each trial step. The BFGS update costs only $O(n^2)\approx1.2\cdot10^{3}$ operations, below 1\% of one gradient, so BFGS and GM cost the same per iteration and BFGS wins only through fewer iterations. A minibatch gradient takes $4.0\cdot10^{-5}$\,s, which is close to the $3.6\cdot10^{-5}$\,s per SGM step, and an epoch of 500 steps takes about $500\cdot4.0\cdot10^{-5}=0.020$\,s, about three times less than a GM iteration.
 
 \textbf{Local order.} Figure~\ref{fig:rk} shows $\|\nabla\tilde L(w^k)\|$ and the ratio $r_k=\|\nabla\tilde L(w^{k+1})\|/\|\nabla\tilde L(w^{k})\|$ for GM and BFGS on digits 4, 6 and 8, using the gradient norm as allowed by the definition above.
 

@@ -19,7 +19,7 @@
 % state of the generator. As in uo_nn_solve_st, the datasets are generated
 % right before every run, so the reference runs are those of the batch.
 % Writes uo_nn_lambda_analysis.csv, uo_nn_lambda_analysis.mat and the
-% figure ../../Docs/fig_rk_lambda.png.
+% figure fig_rk_lambda.png.
 %
 % Calls: uo_nn_dataset, uosol_st
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,4 +136,4 @@ for a = 1:2
         if a == 1 && j == 1, legend('Location','northeast'); end
     end
 end
-exportgraphics(gcf,'../../Docs/fig_rk_lambda.png','Resolution',150);
+exportgraphics(gcf,'fig_rk_lambda.png','Resolution',150);

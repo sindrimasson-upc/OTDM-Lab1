@@ -143,14 +143,11 @@ The differences are very small: 0.34 percentage points between the best and the 
 
 ---
 
-## 9. Wolfe count for GM on digit 8 (Section 1.2, paragraph on BFGS conditions)
+## 9. DROPPED: Wolfe count for GM on digit 8
 
-Rerunning digit 8, lambda = 0, GM with the batch settings gives a strong Wolfe step in
-86 of 100 iterations, not 84. The other counts (16/16, 57/61 for GM; 8/8, 18/18, 97/97
-for BFGS) and the kappa(H) / cos(theta) values match. Check where 84 came from; if it was
-a separate run, see the note on reproducibility below.
-
-Find: `84/100` -> Replace: `86/100`
+84/100 is correct. It comes from `uo_nn_diag.m`, whose run matches the batch
+(||g|| = 2.81e-3). The 86 came from my rerun on a second computer, which drifted on
+this long GM run (||g|| = 3.3e-3).
 
 ---
 
