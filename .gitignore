@@ -1,0 +1,19 @@
+# MATLAB autosave / figure files
+*.asv
+*.fig
+
+# LaTeX build output (if you ever compile locally)
+*.aux
+*.log
+!Code/uonn/uo_nn_batch_st.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+Docs/*.pdf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
