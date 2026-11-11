@@ -1,0 +1,6 @@
+Distribution: uonn, built on 23-Oct-2026 14:50:32.
+
+Llicense: © F.-Javier Heredia Cervera, f.javier.heredia@upc.edu,
+          Shared under licence Creative Commons by-nc-nd 4.0:
+          Attribution-NonCommercial-NoDerivatives 4.0 International,
+          https://creativecommons.org/licenses/by-nc-nd/4.0/
